@@ -57,10 +57,10 @@ var _ = Describe("StagedConfig", func() {
 			},
 		}, nil)
 
-		stagedConfigService.JobsReturns(map[string]string{
+		stagedConfigService.ListStagedProductJobsReturns(map[string]string{
 			"some-job": "some-job-guid",
 		}, nil)
-		stagedConfigService.GetExistingJobConfigReturns(api.JobProperties{
+		stagedConfigService.GetStagedProductJobResourceConfigReturns(api.JobProperties{
 			InstanceType: api.InstanceType{
 				ID: "automatic",
 			},
@@ -85,11 +85,11 @@ var _ = Describe("StagedConfig", func() {
 			Expect(stagedConfigService.NetworksAndAZsCallCount()).To(Equal(1))
 			Expect(stagedConfigService.NetworksAndAZsArgsForCall(0)).To(Equal("some-product-guid"))
 
-			Expect(stagedConfigService.JobsCallCount()).To(Equal(1))
-			Expect(stagedConfigService.JobsArgsForCall(0)).To(Equal("some-product-guid"))
+			Expect(stagedConfigService.ListStagedProductJobsCallCount()).To(Equal(1))
+			Expect(stagedConfigService.ListStagedProductJobsArgsForCall(0)).To(Equal("some-product-guid"))
 
-			Expect(stagedConfigService.GetExistingJobConfigCallCount()).To(Equal(1))
-			productGuid, jobsGuid := stagedConfigService.GetExistingJobConfigArgsForCall(0)
+			Expect(stagedConfigService.GetStagedProductJobResourceConfigCallCount()).To(Equal(1))
+			productGuid, jobsGuid := stagedConfigService.GetStagedProductJobResourceConfigArgsForCall(0)
 			Expect(productGuid).To(Equal("some-product-guid"))
 			Expect(jobsGuid).To(Equal("some-job-guid"))
 
@@ -175,7 +175,7 @@ resource-config:
 
 		Context("when listing jobs fails", func() {
 			BeforeEach(func() {
-				stagedConfigService.JobsReturns(nil, errors.New("some-error"))
+				stagedConfigService.ListStagedProductJobsReturns(nil, errors.New("some-error"))
 			})
 
 			It("returns an error", func() {
@@ -189,7 +189,7 @@ resource-config:
 
 		Context("when looking up the job fails", func() {
 			BeforeEach(func() {
-				stagedConfigService.GetExistingJobConfigReturns(api.JobProperties{}, errors.New("some-error"))
+				stagedConfigService.GetStagedProductJobResourceConfigReturns(api.JobProperties{}, errors.New("some-error"))
 			})
 
 			It("returns an error", func() {

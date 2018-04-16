@@ -39,7 +39,7 @@ var _ = Describe("UploadStemcell", func() {
 		}
 		multipart.FinalizeReturns(submission, nil)
 
-		diagnosticService.ReportReturns(api.DiagnosticReport{Stemcells: []string{}}, nil)
+		diagnosticService.GetDiagnosticReportReturns(api.DiagnosticReport{Stemcells: []string{}}, nil)
 
 		command := commands.NewUploadStemcell(multipart, stemcellService, diagnosticService, logger)
 
@@ -79,7 +79,7 @@ var _ = Describe("UploadStemcell", func() {
 				}
 				multipart.FinalizeReturns(submission, nil)
 
-				diagnosticService.ReportReturns(api.DiagnosticReport{
+				diagnosticService.GetDiagnosticReportReturns(api.DiagnosticReport{
 					Stemcells: []string{"stemcell.tgz"},
 				}, nil)
 
@@ -104,7 +104,7 @@ var _ = Describe("UploadStemcell", func() {
 				}
 				multipart.FinalizeReturns(submission, nil)
 
-				diagnosticService.ReportReturns(api.DiagnosticReport{
+				diagnosticService.GetDiagnosticReportReturns(api.DiagnosticReport{
 					Stemcells: []string{"stemcell.tgz"},
 				}, nil)
 
@@ -145,7 +145,7 @@ var _ = Describe("UploadStemcell", func() {
 			}
 			multipart.FinalizeReturns(submission, nil)
 
-			diagnosticService.ReportReturns(api.DiagnosticReport{}, api.DiagnosticReportUnavailable{})
+			diagnosticService.GetDiagnosticReportReturns(api.DiagnosticReport{}, api.DiagnosticReportUnavailable{})
 
 			command := commands.NewUploadStemcell(multipart, stemcellService, diagnosticService, logger)
 
@@ -219,7 +219,7 @@ var _ = Describe("UploadStemcell", func() {
 		Context("when the diagnostic report cannot be fetched", func() {
 			It("returns an error", func() {
 				command := commands.NewUploadStemcell(multipart, stemcellService, diagnosticService, logger)
-				diagnosticService.ReportReturns(api.DiagnosticReport{}, errors.New("some diagnostic error"))
+				diagnosticService.GetDiagnosticReportReturns(api.DiagnosticReport{}, errors.New("some diagnostic error"))
 
 				err := command.Execute([]string{"--stemcell", "/some/path"})
 				Expect(err).To(MatchError("failed to get diagnostic report: some diagnostic error"))

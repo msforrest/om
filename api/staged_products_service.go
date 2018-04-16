@@ -154,7 +154,7 @@ func (p StagedProductsService) Unstage(input UnstageProductInput) error {
 	return nil
 }
 
-func (p StagedProductsService) List() (StagedProductsOutput, error) {
+func (p StagedProductsService) ListStagedProducts() (StagedProductsOutput, error) {
 	req, err := http.NewRequest("GET", "/api/v0/staged/products", nil)
 	if err != nil {
 		return StagedProductsOutput{}, err
@@ -248,7 +248,7 @@ func createConfigureRequests(input ProductsConfigurationInput) ([]*http.Request,
 }
 
 func (p StagedProductsService) Find(productName string) (StagedProductsFindOutput, error) {
-	productsOutput, err := p.List()
+	productsOutput, err := p.ListStagedProducts()
 	if err != nil {
 		return StagedProductsFindOutput{}, err
 	}
@@ -360,7 +360,7 @@ func (p StagedProductsService) fetchProductResource(guid, endpoint string) (io.R
 }
 
 func (p StagedProductsService) checkStagedProducts(productName string) (string, error) {
-	stagedProductsOutput, err := p.List()
+	stagedProductsOutput, err := p.ListStagedProducts()
 	if err != nil {
 		return "", err
 	}

@@ -406,7 +406,7 @@ var _ = Describe("StagedProductsService", func() {
 		})
 	})
 
-	Describe("List", func() {
+	Describe("ListStagedProducts", func() {
 		var (
 			client *fakes.HttpClient
 		)
@@ -440,7 +440,7 @@ var _ = Describe("StagedProductsService", func() {
 		It("retrieves a list of staged products from the Ops Manager", func() {
 			service := api.NewStagedProductsService(client)
 
-			output, err := service.List()
+			output, err := service.ListStagedProducts()
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(output).To(Equal(api.StagedProductsOutput{
@@ -472,7 +472,7 @@ var _ = Describe("StagedProductsService", func() {
 				It("returns an error", func() {
 					service := api.NewStagedProductsService(client)
 
-					_, err := service.List()
+					_, err := service.ListStagedProducts()
 					Expect(err).To(MatchError("could not make request to staged-products endpoint: nope"))
 				})
 			})
@@ -488,7 +488,7 @@ var _ = Describe("StagedProductsService", func() {
 				It("returns an error", func() {
 					service := api.NewStagedProductsService(client)
 
-					_, err := service.List()
+					_, err := service.ListStagedProducts()
 					Expect(err).To(MatchError(ContainSubstring("request failed: unexpected response")))
 				})
 			})
@@ -504,7 +504,7 @@ var _ = Describe("StagedProductsService", func() {
 				It("returns an error", func() {
 					service := api.NewStagedProductsService(client)
 
-					_, err := service.List()
+					_, err := service.ListStagedProducts()
 					Expect(err).To(MatchError(ContainSubstring("could not unmarshal staged products response:")))
 				})
 			})

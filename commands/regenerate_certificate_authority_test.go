@@ -27,7 +27,7 @@ var _ = Describe("RegenerateCertificateAuthority", func() {
 		It("makes a request to the Opsman to regenerate an inactive certificate authority", func() {
 			err := command.Execute([]string{})
 			Expect(err).NotTo(HaveOccurred())
-			Expect(fakeCertificateAuthorityService.RegenerateCallCount()).To(Equal(1))
+			Expect(fakeCertificateAuthorityService.RegenerateCertificatesCallCount()).To(Equal(1))
 
 			Expect(fakeLogger.PrintfCallCount()).To(Equal(1))
 			format, content := fakeLogger.PrintfArgsForCall(0)

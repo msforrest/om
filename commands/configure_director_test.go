@@ -30,10 +30,10 @@ var _ = Describe("ConfigureDirector", func() {
 				GUID: "p-bosh-guid",
 			},
 		}, nil)
-		jobsService.JobsReturns(map[string]string{
+		jobsService.ListStagedProductJobsReturns(map[string]string{
 			"resource": "some-resource-guid",
 		}, nil)
-		jobsService.GetExistingJobConfigReturns(api.JobProperties{
+		jobsService.GetStagedProductJobResourceConfigReturns(api.JobProperties{
 			InstanceType: api.InstanceType{
 				ID: "automatic",
 			},
@@ -86,16 +86,16 @@ var _ = Describe("ConfigureDirector", func() {
 			Expect(stagedProductsService.FindCallCount()).To(Equal(1))
 			Expect(stagedProductsService.FindArgsForCall(0)).To(Equal("p-bosh"))
 
-			Expect(jobsService.JobsCallCount()).To(Equal(1))
-			Expect(jobsService.JobsArgsForCall(0)).To(Equal("p-bosh-guid"))
+			Expect(jobsService.ListStagedProductJobsCallCount()).To(Equal(1))
+			Expect(jobsService.ListStagedProductJobsArgsForCall(0)).To(Equal("p-bosh-guid"))
 
-			Expect(jobsService.GetExistingJobConfigCallCount()).To(Equal(1))
-			productGUID, instanceGroupGUID := jobsService.GetExistingJobConfigArgsForCall(0)
+			Expect(jobsService.GetStagedProductJobResourceConfigCallCount()).To(Equal(1))
+			productGUID, instanceGroupGUID := jobsService.GetStagedProductJobResourceConfigArgsForCall(0)
 			Expect(productGUID).To(Equal("p-bosh-guid"))
 			Expect(instanceGroupGUID).To(Equal("some-resource-guid"))
 
-			Expect(jobsService.ConfigureJobCallCount()).To(Equal(1))
-			productGUID, instanceGroupGUID, jobConfiguration := jobsService.ConfigureJobArgsForCall(0)
+			Expect(jobsService.UpdateStagedProductJobResourceConfigCallCount()).To(Equal(1))
+			productGUID, instanceGroupGUID, jobConfiguration := jobsService.UpdateStagedProductJobResourceConfigArgsForCall(0)
 			Expect(productGUID).To(Equal("p-bosh-guid"))
 			Expect(instanceGroupGUID).To(Equal("some-resource-guid"))
 			Expect(jobConfiguration).To(Equal(api.JobProperties{
@@ -195,7 +195,7 @@ var _ = Describe("ConfigureDirector", func() {
 
 			Context("when retrieving jobs for product fails", func() {
 				It("returns an error", func() {
-					jobsService.JobsReturns(nil, errors.New("some-error"))
+					jobsService.ListStagedProductJobsReturns(nil, errors.New("some-error"))
 					err := command.Execute([]string{"--resource-configuration", `{}`})
 					Expect(err).To(MatchError(ContainSubstring("some-error")))
 				})
@@ -210,7 +210,7 @@ var _ = Describe("ConfigureDirector", func() {
 
 			Context("when retrieving existing job config fails", func() {
 				It("returns an error", func() {
-					jobsService.GetExistingJobConfigReturns(api.JobProperties{}, errors.New("some-error"))
+					jobsService.GetStagedProductJobResourceConfigReturns(api.JobProperties{}, errors.New("some-error"))
 					err := command.Execute([]string{"--resource-configuration", `{"resource": {}}`})
 					Expect(err).To(MatchError(ContainSubstring("some-error")))
 				})
@@ -225,7 +225,7 @@ var _ = Describe("ConfigureDirector", func() {
 
 			Context("when configuring the job fails", func() {
 				It("returns an error", func() {
-					jobsService.ConfigureJobReturns(errors.New("some-error"))
+					jobsService.UpdateStagedProductJobResourceConfigReturns(errors.New("some-error"))
 					err := command.Execute([]string{"--resource-configuration", `{"resource": {}}`})
 					Expect(err).To(MatchError(ContainSubstring("some-error")))
 				})

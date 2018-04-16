@@ -38,9 +38,9 @@ type directorService interface {
 //go:generate counterfeiter -o ./fakes/jobs_service.go --fake-name JobsService . jobsService
 
 type jobsService interface {
-	Jobs(string) (map[string]string, error)
-	GetExistingJobConfig(string, string) (api.JobProperties, error)
-	ConfigureJob(string, string, api.JobProperties) error
+	ListStagedProductJobs(string) (map[string]string, error)
+	GetStagedProductJobResourceConfig(string, string) (api.JobProperties, error)
+	UpdateStagedProductJobResourceConfig(string, string, api.JobProperties) error
 }
 
 //go:generate counterfeiter -o ./fakes/staged_products_service.go --fake-name StagedProductsService . stagedProductsService
@@ -125,7 +125,7 @@ func (c ConfigureDirector) Execute(args []string) error {
 			return fmt.Errorf("could not decode resource-configuration json: %s", err)
 		}
 
-		jobs, err := c.jobsService.Jobs(productGUID)
+		jobs, err := c.jobsService.ListStagedProductJobs(productGUID)
 		if err != nil {
 			return fmt.Errorf("failed to fetch jobs: %s", err)
 		}
@@ -145,7 +145,7 @@ func (c ConfigureDirector) Execute(args []string) error {
 				return fmt.Errorf("product 'p-bosh' does not contain a job named '%s'", name)
 			}
 
-			jobProperties, err := c.jobsService.GetExistingJobConfig(productGUID, jobGUID)
+			jobProperties, err := c.jobsService.GetStagedProductJobResourceConfig(productGUID, jobGUID)
 			if err != nil {
 				return fmt.Errorf("could not fetch existing job configuration for '%s': %s", name, err)
 			}
@@ -155,7 +155,7 @@ func (c ConfigureDirector) Execute(args []string) error {
 				return fmt.Errorf("could not decode resource-configuration json for job '%s': %s", name, err)
 			}
 
-			err = c.jobsService.ConfigureJob(productGUID, jobGUID, jobProperties)
+			err = c.jobsService.UpdateStagedProductJobResourceConfig(productGUID, jobGUID, jobProperties)
 			if err != nil {
 				return fmt.Errorf("failed to configure resources for '%s': %s", name, err)
 			}

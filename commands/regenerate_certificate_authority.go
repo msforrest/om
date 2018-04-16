@@ -9,7 +9,7 @@ type RegenerateCertificateAuthority struct {
 
 //go:generate counterfeiter -o ./fakes/certificate_authority_regenerator.go --fake-name CertificateAuthorityRegenerator . certificateAuthorityRegenerator
 type certificateAuthorityRegenerator interface {
-	Regenerate() error
+	RegenerateCertificates() error
 }
 
 func NewRegenerateCertificateAuthority(service certificateAuthorityRegenerator, logger logger) RegenerateCertificateAuthority {
@@ -17,7 +17,7 @@ func NewRegenerateCertificateAuthority(service certificateAuthorityRegenerator, 
 }
 
 func (r RegenerateCertificateAuthority) Execute(_ []string) error {
-	err := r.service.Regenerate()
+	err := r.service.RegenerateCertificates()
 	if err != nil {
 		return err
 	}

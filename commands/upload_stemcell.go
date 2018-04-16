@@ -34,7 +34,7 @@ type stemcellService interface {
 
 //go:generate counterfeiter -o ./fakes/diagnostic_service.go --fake-name DiagnosticService . diagnosticService
 type diagnosticService interface {
-	Report() (api.DiagnosticReport, error)
+	GetDiagnosticReport() (api.DiagnosticReport, error)
 }
 
 func NewUploadStemcell(multipart multipart, stemcellService stemcellService, diagnosticService diagnosticService, logger logger) UploadStemcell {
@@ -61,7 +61,7 @@ func (us UploadStemcell) Execute(args []string) error {
 
 	if !us.Options.Force {
 		us.logger.Printf("processing stemcell")
-		report, err := us.diagnosticService.Report()
+		report, err := us.diagnosticService.GetDiagnosticReport()
 		if err != nil {
 			switch err.(type) {
 			case api.DiagnosticReportUnavailable:
