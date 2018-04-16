@@ -51,7 +51,7 @@ var _ = Describe("UploadStemcell", func() {
 		key, file := multipart.AddFileArgsForCall(0)
 		Expect(key).To(Equal("stemcell[file]"))
 		Expect(file).To(Equal("/path/to/stemcell.tgz"))
-		Expect(stemcellService.UploadArgsForCall(0)).To(Equal(api.StemcellUploadInput{
+		Expect(stemcellService.UploadStemcellArgsForCall(0)).To(Equal(api.StemcellUploadInput{
 			ContentLength: 10,
 			Stemcell:      ioutil.NopCloser(strings.NewReader("")),
 			ContentType:   "some content-type",
@@ -119,7 +119,7 @@ var _ = Describe("UploadStemcell", func() {
 				key, file := multipart.AddFileArgsForCall(0)
 				Expect(key).To(Equal("stemcell[file]"))
 				Expect(file).To(Equal("/path/to/stemcell.tgz"))
-				Expect(stemcellService.UploadArgsForCall(0)).To(Equal(api.StemcellUploadInput{
+				Expect(stemcellService.UploadStemcellArgsForCall(0)).To(Equal(api.StemcellUploadInput{
 					ContentLength: 10,
 					Stemcell:      ioutil.NopCloser(strings.NewReader("")),
 					ContentType:   "some content-type",
@@ -157,7 +157,7 @@ var _ = Describe("UploadStemcell", func() {
 			key, file := multipart.AddFileArgsForCall(0)
 			Expect(key).To(Equal("stemcell[file]"))
 			Expect(file).To(Equal("/path/to/stemcell.tgz"))
-			Expect(stemcellService.UploadArgsForCall(0)).To(Equal(api.StemcellUploadInput{
+			Expect(stemcellService.UploadStemcellArgsForCall(0)).To(Equal(api.StemcellUploadInput{
 				ContentLength: 10,
 				Stemcell:      ioutil.NopCloser(strings.NewReader("")),
 				ContentType:   "some content-type",
@@ -209,7 +209,7 @@ var _ = Describe("UploadStemcell", func() {
 		Context("when the stemcell cannot be uploaded", func() {
 			It("returns an error", func() {
 				command := commands.NewUploadStemcell(multipart, stemcellService, diagnosticService, logger)
-				stemcellService.UploadReturns(api.StemcellUploadOutput{}, errors.New("some stemcell error"))
+				stemcellService.UploadStemcellReturns(api.StemcellUploadOutput{}, errors.New("some stemcell error"))
 
 				err := command.Execute([]string{"--stemcell", "/some/path"})
 				Expect(err).To(MatchError("failed to upload stemcell: some stemcell error"))
