@@ -21,8 +21,8 @@ type stagedConfigService interface {
 	Find(product string) (api.StagedProductsFindOutput, error)
 	ListStagedProductJobs(productGUID string) (map[string]string, error)
 	GetStagedProductJobResourceConfig(productGUID, jobGUID string) (api.JobProperties, error)
-	Properties(product string) (map[string]api.ResponseProperty, error)
-	NetworksAndAZs(product string) (map[string]interface{}, error)
+	GetStagedProductProperties(product string) (map[string]api.ResponseProperty, error)
+	GetStagedProductNetworksAndAZs(product string) (map[string]interface{}, error)
 }
 
 func NewStagedConfig(stagedConfigService stagedConfigService, logger logger) StagedConfig {
@@ -51,7 +51,7 @@ func (ec StagedConfig) Execute(args []string) error {
 	}
 	productGUID := findOutput.Product.GUID
 
-	properties, err := ec.stagedConfigService.Properties(productGUID)
+	properties, err := ec.stagedConfigService.GetStagedProductProperties(productGUID)
 	if err != nil {
 		return err
 	}
@@ -64,7 +64,7 @@ func (ec StagedConfig) Execute(args []string) error {
 		}
 	}
 
-	networks, err := ec.stagedConfigService.NetworksAndAZs(productGUID)
+	networks, err := ec.stagedConfigService.GetStagedProductNetworksAndAZs(productGUID)
 	if err != nil {
 		return err
 	}

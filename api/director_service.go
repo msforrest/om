@@ -32,7 +32,7 @@ func NewDirectorService(client httpClient) DirectorService {
 	}
 }
 
-func (d DirectorService) SetAZConfiguration(input AZConfiguration) error {
+func (d DirectorService) UpdateStagedDirectorAvailabilityZones(input AZConfiguration) error {
 	jsonData, err := json.Marshal(&input)
 	if err != nil {
 		return fmt.Errorf("could not marshal json: %s", err)
@@ -41,7 +41,7 @@ func (d DirectorService) SetAZConfiguration(input AZConfiguration) error {
 	return d.sendAPIRequest("PUT", "/api/v0/staged/director/availability_zones", jsonData)
 }
 
-func (d DirectorService) SetNetworksConfiguration(input json.RawMessage) error {
+func (d DirectorService) UpdateStagedDirectorNetworks(input json.RawMessage) error {
 	jsonData, err := json.Marshal(&input)
 	if err != nil {
 		return fmt.Errorf("could not marshal json: %s", err)
@@ -50,7 +50,7 @@ func (d DirectorService) SetNetworksConfiguration(input json.RawMessage) error {
 	return d.sendAPIRequest("PUT", "/api/v0/staged/director/networks", jsonData)
 }
 
-func (d DirectorService) SetNetworkAndAZ(input NetworkAndAZConfiguration) error {
+func (d DirectorService) UpdateStagedDirectorNetworkAndAZ(input NetworkAndAZConfiguration) error {
 	jsonData, err := json.Marshal(&input)
 	if err != nil {
 		return fmt.Errorf("could not marshal json: %s", err)
@@ -59,7 +59,7 @@ func (d DirectorService) SetNetworkAndAZ(input NetworkAndAZConfiguration) error 
 	return d.sendAPIRequest("PUT", "/api/v0/staged/director/network_and_az", jsonData)
 }
 
-func (d DirectorService) SetProperties(input DirectorProperties) error {
+func (d DirectorService) UpdateStagedDirectorProperties(input DirectorProperties) error {
 	jsonData, err := json.Marshal(&input)
 	if err != nil {
 		return fmt.Errorf("could not marshal json: %s", err)

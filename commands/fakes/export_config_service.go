@@ -48,29 +48,29 @@ type StagedConfigService struct {
 		result1 api.JobProperties
 		result2 error
 	}
-	PropertiesStub        func(product string) (map[string]api.ResponseProperty, error)
-	propertiesMutex       sync.RWMutex
-	propertiesArgsForCall []struct {
+	GetStagedProductPropertiesStub        func(product string) (map[string]api.ResponseProperty, error)
+	getStagedProductPropertiesMutex       sync.RWMutex
+	getStagedProductPropertiesArgsForCall []struct {
 		product string
 	}
-	propertiesReturns struct {
+	getStagedProductPropertiesReturns struct {
 		result1 map[string]api.ResponseProperty
 		result2 error
 	}
-	propertiesReturnsOnCall map[int]struct {
+	getStagedProductPropertiesReturnsOnCall map[int]struct {
 		result1 map[string]api.ResponseProperty
 		result2 error
 	}
-	NetworksAndAZsStub        func(product string) (map[string]interface{}, error)
-	networksAndAZsMutex       sync.RWMutex
-	networksAndAZsArgsForCall []struct {
+	GetStagedProductNetworksAndAZsStub        func(product string) (map[string]interface{}, error)
+	getStagedProductNetworksAndAZsMutex       sync.RWMutex
+	getStagedProductNetworksAndAZsArgsForCall []struct {
 		product string
 	}
-	networksAndAZsReturns struct {
+	getStagedProductNetworksAndAZsReturns struct {
 		result1 map[string]interface{}
 		result2 error
 	}
-	networksAndAZsReturnsOnCall map[int]struct {
+	getStagedProductNetworksAndAZsReturnsOnCall map[int]struct {
 		result1 map[string]interface{}
 		result2 error
 	}
@@ -232,103 +232,103 @@ func (fake *StagedConfigService) GetStagedProductJobResourceConfigReturnsOnCall(
 	}{result1, result2}
 }
 
-func (fake *StagedConfigService) Properties(product string) (map[string]api.ResponseProperty, error) {
-	fake.propertiesMutex.Lock()
-	ret, specificReturn := fake.propertiesReturnsOnCall[len(fake.propertiesArgsForCall)]
-	fake.propertiesArgsForCall = append(fake.propertiesArgsForCall, struct {
+func (fake *StagedConfigService) GetStagedProductProperties(product string) (map[string]api.ResponseProperty, error) {
+	fake.getStagedProductPropertiesMutex.Lock()
+	ret, specificReturn := fake.getStagedProductPropertiesReturnsOnCall[len(fake.getStagedProductPropertiesArgsForCall)]
+	fake.getStagedProductPropertiesArgsForCall = append(fake.getStagedProductPropertiesArgsForCall, struct {
 		product string
 	}{product})
-	fake.recordInvocation("Properties", []interface{}{product})
-	fake.propertiesMutex.Unlock()
-	if fake.PropertiesStub != nil {
-		return fake.PropertiesStub(product)
+	fake.recordInvocation("GetStagedProductProperties", []interface{}{product})
+	fake.getStagedProductPropertiesMutex.Unlock()
+	if fake.GetStagedProductPropertiesStub != nil {
+		return fake.GetStagedProductPropertiesStub(product)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	return fake.propertiesReturns.result1, fake.propertiesReturns.result2
+	return fake.getStagedProductPropertiesReturns.result1, fake.getStagedProductPropertiesReturns.result2
 }
 
-func (fake *StagedConfigService) PropertiesCallCount() int {
-	fake.propertiesMutex.RLock()
-	defer fake.propertiesMutex.RUnlock()
-	return len(fake.propertiesArgsForCall)
+func (fake *StagedConfigService) GetStagedProductPropertiesCallCount() int {
+	fake.getStagedProductPropertiesMutex.RLock()
+	defer fake.getStagedProductPropertiesMutex.RUnlock()
+	return len(fake.getStagedProductPropertiesArgsForCall)
 }
 
-func (fake *StagedConfigService) PropertiesArgsForCall(i int) string {
-	fake.propertiesMutex.RLock()
-	defer fake.propertiesMutex.RUnlock()
-	return fake.propertiesArgsForCall[i].product
+func (fake *StagedConfigService) GetStagedProductPropertiesArgsForCall(i int) string {
+	fake.getStagedProductPropertiesMutex.RLock()
+	defer fake.getStagedProductPropertiesMutex.RUnlock()
+	return fake.getStagedProductPropertiesArgsForCall[i].product
 }
 
-func (fake *StagedConfigService) PropertiesReturns(result1 map[string]api.ResponseProperty, result2 error) {
-	fake.PropertiesStub = nil
-	fake.propertiesReturns = struct {
+func (fake *StagedConfigService) GetStagedProductPropertiesReturns(result1 map[string]api.ResponseProperty, result2 error) {
+	fake.GetStagedProductPropertiesStub = nil
+	fake.getStagedProductPropertiesReturns = struct {
 		result1 map[string]api.ResponseProperty
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *StagedConfigService) PropertiesReturnsOnCall(i int, result1 map[string]api.ResponseProperty, result2 error) {
-	fake.PropertiesStub = nil
-	if fake.propertiesReturnsOnCall == nil {
-		fake.propertiesReturnsOnCall = make(map[int]struct {
+func (fake *StagedConfigService) GetStagedProductPropertiesReturnsOnCall(i int, result1 map[string]api.ResponseProperty, result2 error) {
+	fake.GetStagedProductPropertiesStub = nil
+	if fake.getStagedProductPropertiesReturnsOnCall == nil {
+		fake.getStagedProductPropertiesReturnsOnCall = make(map[int]struct {
 			result1 map[string]api.ResponseProperty
 			result2 error
 		})
 	}
-	fake.propertiesReturnsOnCall[i] = struct {
+	fake.getStagedProductPropertiesReturnsOnCall[i] = struct {
 		result1 map[string]api.ResponseProperty
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *StagedConfigService) NetworksAndAZs(product string) (map[string]interface{}, error) {
-	fake.networksAndAZsMutex.Lock()
-	ret, specificReturn := fake.networksAndAZsReturnsOnCall[len(fake.networksAndAZsArgsForCall)]
-	fake.networksAndAZsArgsForCall = append(fake.networksAndAZsArgsForCall, struct {
+func (fake *StagedConfigService) GetStagedProductNetworksAndAZs(product string) (map[string]interface{}, error) {
+	fake.getStagedProductNetworksAndAZsMutex.Lock()
+	ret, specificReturn := fake.getStagedProductNetworksAndAZsReturnsOnCall[len(fake.getStagedProductNetworksAndAZsArgsForCall)]
+	fake.getStagedProductNetworksAndAZsArgsForCall = append(fake.getStagedProductNetworksAndAZsArgsForCall, struct {
 		product string
 	}{product})
-	fake.recordInvocation("NetworksAndAZs", []interface{}{product})
-	fake.networksAndAZsMutex.Unlock()
-	if fake.NetworksAndAZsStub != nil {
-		return fake.NetworksAndAZsStub(product)
+	fake.recordInvocation("GetStagedProductNetworksAndAZs", []interface{}{product})
+	fake.getStagedProductNetworksAndAZsMutex.Unlock()
+	if fake.GetStagedProductNetworksAndAZsStub != nil {
+		return fake.GetStagedProductNetworksAndAZsStub(product)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	return fake.networksAndAZsReturns.result1, fake.networksAndAZsReturns.result2
+	return fake.getStagedProductNetworksAndAZsReturns.result1, fake.getStagedProductNetworksAndAZsReturns.result2
 }
 
-func (fake *StagedConfigService) NetworksAndAZsCallCount() int {
-	fake.networksAndAZsMutex.RLock()
-	defer fake.networksAndAZsMutex.RUnlock()
-	return len(fake.networksAndAZsArgsForCall)
+func (fake *StagedConfigService) GetStagedProductNetworksAndAZsCallCount() int {
+	fake.getStagedProductNetworksAndAZsMutex.RLock()
+	defer fake.getStagedProductNetworksAndAZsMutex.RUnlock()
+	return len(fake.getStagedProductNetworksAndAZsArgsForCall)
 }
 
-func (fake *StagedConfigService) NetworksAndAZsArgsForCall(i int) string {
-	fake.networksAndAZsMutex.RLock()
-	defer fake.networksAndAZsMutex.RUnlock()
-	return fake.networksAndAZsArgsForCall[i].product
+func (fake *StagedConfigService) GetStagedProductNetworksAndAZsArgsForCall(i int) string {
+	fake.getStagedProductNetworksAndAZsMutex.RLock()
+	defer fake.getStagedProductNetworksAndAZsMutex.RUnlock()
+	return fake.getStagedProductNetworksAndAZsArgsForCall[i].product
 }
 
-func (fake *StagedConfigService) NetworksAndAZsReturns(result1 map[string]interface{}, result2 error) {
-	fake.NetworksAndAZsStub = nil
-	fake.networksAndAZsReturns = struct {
+func (fake *StagedConfigService) GetStagedProductNetworksAndAZsReturns(result1 map[string]interface{}, result2 error) {
+	fake.GetStagedProductNetworksAndAZsStub = nil
+	fake.getStagedProductNetworksAndAZsReturns = struct {
 		result1 map[string]interface{}
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *StagedConfigService) NetworksAndAZsReturnsOnCall(i int, result1 map[string]interface{}, result2 error) {
-	fake.NetworksAndAZsStub = nil
-	if fake.networksAndAZsReturnsOnCall == nil {
-		fake.networksAndAZsReturnsOnCall = make(map[int]struct {
+func (fake *StagedConfigService) GetStagedProductNetworksAndAZsReturnsOnCall(i int, result1 map[string]interface{}, result2 error) {
+	fake.GetStagedProductNetworksAndAZsStub = nil
+	if fake.getStagedProductNetworksAndAZsReturnsOnCall == nil {
+		fake.getStagedProductNetworksAndAZsReturnsOnCall = make(map[int]struct {
 			result1 map[string]interface{}
 			result2 error
 		})
 	}
-	fake.networksAndAZsReturnsOnCall[i] = struct {
+	fake.getStagedProductNetworksAndAZsReturnsOnCall[i] = struct {
 		result1 map[string]interface{}
 		result2 error
 	}{result1, result2}
@@ -343,10 +343,10 @@ func (fake *StagedConfigService) Invocations() map[string][][]interface{} {
 	defer fake.listStagedProductJobsMutex.RUnlock()
 	fake.getStagedProductJobResourceConfigMutex.RLock()
 	defer fake.getStagedProductJobResourceConfigMutex.RUnlock()
-	fake.propertiesMutex.RLock()
-	defer fake.propertiesMutex.RUnlock()
-	fake.networksAndAZsMutex.RLock()
-	defer fake.networksAndAZsMutex.RUnlock()
+	fake.getStagedProductPropertiesMutex.RLock()
+	defer fake.getStagedProductPropertiesMutex.RUnlock()
+	fake.getStagedProductNetworksAndAZsMutex.RLock()
+	defer fake.getStagedProductNetworksAndAZsMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

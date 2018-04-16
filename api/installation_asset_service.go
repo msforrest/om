@@ -32,7 +32,7 @@ func NewInstallationAssetService(client, progressClient httpClient) Installation
 	}
 }
 
-func (ia InstallationAssetService) Export(outputFile string, pollingInterval int) error {
+func (ia InstallationAssetService) DownloadInstallationAssetCollection(outputFile string, pollingInterval int) error {
 	req, err := http.NewRequest("GET", "/api/v0/installation_asset_collection", nil)
 	if err != nil {
 		return err
@@ -66,7 +66,7 @@ func (ia InstallationAssetService) Export(outputFile string, pollingInterval int
 	return nil
 }
 
-func (ia InstallationAssetService) Import(input ImportInstallationInput) error {
+func (ia InstallationAssetService) UploadInstallationAssetCollection(input ImportInstallationInput) error {
 	req, err := http.NewRequest("POST", "/api/v0/installation_asset_collection", input.Installation)
 	if err != nil {
 		return err
@@ -89,7 +89,7 @@ func (ia InstallationAssetService) Import(input ImportInstallationInput) error {
 	return nil
 }
 
-func (ia InstallationAssetService) Delete() (InstallationsServiceOutput, error) {
+func (ia InstallationAssetService) DeleteInstallationAssetCollection() (InstallationsServiceOutput, error) {
 	req, err := http.NewRequest("DELETE", "/api/v0/installation_asset_collection", bytes.NewBuffer([]byte(`{"errands": {}}`)))
 	if err != nil {
 		return InstallationsServiceOutput{}, err
