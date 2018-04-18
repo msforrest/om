@@ -75,8 +75,73 @@ func (a Api) ListStagedProductJobs(productGUID string) (map[string]string, error
 	return jobGUIDMap, nil
 }
 
+func (a Api) ListDeployedProductJobs(productGUID string) (map[string]string, error) {
+	req, err := http.NewRequest("GET", fmt.Sprintf("/api/v0/deployed/products/%s/jobs", productGUID), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := a.client.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("could not make api request to jobs endpoint: %s", err)
+	}
+
+	defer resp.Body.Close()
+
+	if err = validateStatusOK(resp); err != nil {
+		return nil, err
+	}
+
+	var jobsOutput struct {
+		Jobs []Job
+	}
+
+	err = json.NewDecoder(resp.Body).Decode(&jobsOutput)
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode jobs json response: %s", err)
+	}
+
+	jobGUIDMap := make(map[string]string)
+	for _, job := range jobsOutput.Jobs {
+		jobGUIDMap[job.Name] = job.GUID
+	}
+
+	return jobGUIDMap, nil
+}
+
 func (a Api) GetStagedProductJobResourceConfig(productGUID, jobGUID string) (JobProperties, error) {
 	req, err := http.NewRequest("GET", fmt.Sprintf("/api/v0/staged/products/%s/jobs/%s/resource_config", productGUID, jobGUID), nil)
+	if err != nil {
+		return JobProperties{}, err
+	}
+
+	resp, err := a.client.Do(req)
+	if err != nil {
+		return JobProperties{}, fmt.Errorf("could not make api request to resource_config endpoint: %s", err)
+	}
+
+	defer resp.Body.Close()
+
+	if err = validateStatusOK(resp); err != nil {
+		return JobProperties{}, err
+	}
+
+	content, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return JobProperties{}, err
+	}
+
+	var existingConfig JobProperties
+	err = json.Unmarshal(content, &existingConfig)
+	if err != nil {
+		return JobProperties{}, err
+	}
+
+	return existingConfig, nil
+}
+
+func (a Api) GetDeployedProductJobResourceConfig(productGUID, jobGUID string) (JobProperties, error) {
+	req, err := http.NewRequest("GET", fmt.Sprintf("/api/v0/deployed/products/%s/jobs/%s/resource_config", productGUID, jobGUID), nil)
 	if err != nil {
 		return JobProperties{}, err
 	}

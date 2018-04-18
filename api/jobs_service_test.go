@@ -82,6 +82,62 @@ var _ = Describe("JobsService", func() {
 		})
 	})
 
+	Describe("ListDeployedProductJobs", func() {
+		It("returns a map of the jobs", func() {
+			client.DoReturns(&http.Response{
+				StatusCode: http.StatusOK,
+				Body: ioutil.NopCloser(strings.NewReader(`{"jobs": [{"name":"job-1","guid":"some-guid-1"},
+				{"name":"job-2","guid":"some-guid-2"}]}`)),
+			}, nil)
+
+			jobs, err := service.ListDeployedProductJobs("some-product-guid")
+			Expect(err).NotTo(HaveOccurred())
+			Expect(jobs).To(Equal(map[string]string{
+				"job-1": "some-guid-1",
+				"job-2": "some-guid-2",
+			}))
+
+			request := client.DoArgsForCall(0)
+			Expect(request.Method).To(Equal("GET"))
+			Expect(request.URL.Path).To(Equal("/api/v0/deployed/products/some-product-guid/jobs"))
+		})
+
+		Context("when an error occurs", func() {
+			Context("when the client errors before the request", func() {
+				It("returns an error", func() {
+					client.DoReturns(&http.Response{}, errors.New("bad"))
+
+					_, err := service.ListDeployedProductJobs("some-product-guid")
+					Expect(err).To(MatchError("could not make api request to jobs endpoint: bad"))
+				})
+			})
+
+			Context("when the jobs endpoint returns a non-200 status code", func() {
+				It("returns an error", func() {
+					client.DoReturns(&http.Response{
+						StatusCode: http.StatusInternalServerError,
+						Body:       ioutil.NopCloser(strings.NewReader(``)),
+					}, nil)
+
+					_, err := service.ListDeployedProductJobs("some-product-guid")
+					Expect(err).To(MatchError(ContainSubstring("request failed: unexpected response:")))
+				})
+			})
+
+			Context("when decoding the json fails", func() {
+				It("returns an error", func() {
+					client.DoReturns(&http.Response{
+						StatusCode: http.StatusOK,
+						Body:       ioutil.NopCloser(strings.NewReader(``)),
+					}, nil)
+
+					_, err := service.ListDeployedProductJobs("some-product-guid")
+					Expect(err).To(MatchError(ContainSubstring("failed to decode jobs json response:")))
+				})
+			})
+		})
+	})
+
 	Describe("GetStagedProductJobResourceConfig", func() {
 		It("fetches the resource config for a given job", func() {
 			client.DoReturns(&http.Response{
@@ -241,6 +297,80 @@ var _ = Describe("JobsService", func() {
 					}, nil)
 
 					_, err := service.GetStagedProductJobResourceConfig("some-product-guid", "some-guid")
+
+					Expect(err).To(MatchError(ContainSubstring("invalid character")))
+				})
+			})
+		})
+	})
+
+	Describe("GetDeployedProductJobResourceConfig", func() {
+		It("fetches the resource config for a given job", func() {
+			client.DoReturns(&http.Response{
+				StatusCode: http.StatusOK,
+				Body: ioutil.NopCloser(strings.NewReader(`{
+					"instances": 1,
+					"instance_type": { "id": "number-1" },
+					"persistent_disk": { "size_mb": "290" },
+					"internet_connected": true,
+					"elb_names": ["something"],
+					"additional_vm_extensions": ["some-vm-extension","some-other-vm-extension"]
+				}`)),
+			}, nil)
+
+			job, err := service.GetDeployedProductJobResourceConfig("some-product-guid", "some-guid")
+
+			Expect(err).NotTo(HaveOccurred())
+			Expect(client.DoCallCount()).To(Equal(1))
+			jobProperties := api.JobProperties{
+				Instances:              float64(1),
+				PersistentDisk:         &api.Disk{Size: "290"},
+				InstanceType:           api.InstanceType{ID: "number-1"},
+				InternetConnected:      new(bool),
+				LBNames:                []string{"something"},
+				AdditionalVMExtensions: []string{"some-vm-extension", "some-other-vm-extension"},
+			}
+			*jobProperties.InternetConnected = true
+			Expect(job).To(Equal(jobProperties))
+			request := client.DoArgsForCall(0)
+			Expect("/api/v0/deployed/products/some-product-guid/jobs/some-guid/resource_config").To(Equal(request.URL.Path))
+		})
+
+		Context("failure cases", func() {
+			Context("when the resource config endpoint returns an error", func() {
+				It("returns an error", func() {
+					client.DoReturns(&http.Response{
+						StatusCode: http.StatusOK,
+						Body:       ioutil.NopCloser(strings.NewReader(`{}`)),
+					}, errors.New("some client error"))
+
+					_, err := service.GetDeployedProductJobResourceConfig("some-product-guid", "some-guid")
+
+					Expect(err).To(MatchError("could not make api request to resource_config endpoint: some client error"))
+				})
+			})
+
+			Context("when the resource config endpoint returns a non-200 status code", func() {
+				It("returns an error", func() {
+					client.DoReturns(&http.Response{
+						StatusCode: http.StatusTeapot,
+						Body:       ioutil.NopCloser(strings.NewReader(`{}`)),
+					}, nil)
+
+					_, err := service.GetDeployedProductJobResourceConfig("some-product-guid", "some-guid")
+
+					Expect(err).To(MatchError(ContainSubstring("unexpected response")))
+				})
+			})
+
+			Context("when the resource config returns invalid JSON", func() {
+				It("returns an error", func() {
+					client.DoReturns(&http.Response{
+						StatusCode: http.StatusOK,
+						Body:       ioutil.NopCloser(strings.NewReader(`%%%`)),
+					}, nil)
+
+					_, err := service.GetDeployedProductJobResourceConfig("some-product-guid", "some-guid")
 
 					Expect(err).To(MatchError(ContainSubstring("invalid character")))
 				})

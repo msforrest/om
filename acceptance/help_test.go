@@ -45,6 +45,7 @@ Commands:
   delete-installation             deletes all the products on the Ops Manager targeted
   delete-product                  deletes a product from the Ops Manager
   delete-unused-products          deletes unused products on the Ops Manager targeted
+  deployed-config                 generates a config from a deployed product
   deployed-manifest               prints the deployed manifest for a product
   deployed-products               lists deployed products
   errands                         list errands for a product

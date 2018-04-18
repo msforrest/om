@@ -55,3 +55,28 @@ func (a Api) GetStagedProductByName(productName string) (StagedProductsFindOutpu
 
 	return StagedProductsFindOutput{Product: foundProduct}, nil
 }
+
+type DeployedProductsFindOutput struct {
+	Product DeployedProductOutput
+}
+
+func (a Api) GetDeployedProductByName(productName string) (DeployedProductsFindOutput, error) {
+	productsOutput, err := a.ListDeployedProducts()
+	if err != nil {
+		return DeployedProductsFindOutput{}, err
+	}
+
+	var foundProduct DeployedProductOutput
+	for _, product := range productsOutput {
+		if product.Type == productName {
+			foundProduct = product
+			break
+		}
+	}
+
+	if (foundProduct == DeployedProductOutput{}) {
+		return DeployedProductsFindOutput{}, fmt.Errorf("could not find product %q", productName)
+	}
+
+	return DeployedProductsFindOutput{Product: foundProduct}, nil
+}

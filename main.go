@@ -166,6 +166,7 @@ func main() {
 	commandSet["delete-installation"] = commands.NewDeleteInstallation(api, logWriter, stdout, applySleepSeconds)
 	commandSet["delete-product"] = commands.NewDeleteProduct(api)
 	commandSet["delete-unused-products"] = commands.NewDeleteUnusedProducts(api, stdout)
+	commandSet["deployed-config"] = commands.NewDeployedConfig(api, stdout)
 	commandSet["deployed-manifest"] = commands.NewDeployedManifest(api, stdout)
 	commandSet["deployed-products"] = commands.NewDeployedProducts(presenter, api)
 	commandSet["errands"] = commands.NewErrands(presenter, api)

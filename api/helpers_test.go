@@ -275,4 +275,50 @@ var _ = Describe("Available Products", func() {
 			})
 		})
 	})
+
+	Describe("GetDeployedProductByName", func() {
+		It("Find product by product name", func() {
+			client.DoReturns(&http.Response{
+				StatusCode: http.StatusOK,
+				Body: ioutil.NopCloser(bytes.NewBufferString(`[
+					{"installation_name":"p-bosh","guid":"some-product-id","type":"some-product-name","product_version":"1.10.0.0"},
+					{"installation_name":"cf-15b22d1810a034ea3aca","guid":"cf-15b22d1810a034ea3aca","type":"cf","product_version":"1.10.0-build.177"},
+					{"installation_name":"p-isolation-segment-0ab7a3616c32a441a115","guid":"p-isolation-segment-0ab7a3616c32a441a115","type":"p-isolation-segment","product_version":"1.10.0-build.31"}
+				]`)),
+			}, nil)
+
+			finderOutput, err := service.GetDeployedProductByName("some-product-name")
+			Expect(err).NotTo(HaveOccurred())
+			Expect(finderOutput.Product.GUID).To(Equal("some-product-id"))
+		})
+
+		Context("failure cases", func() {
+			Context("Failed to list deployed products", func() {
+				It("returns an error", func() {
+					client.DoReturns(&http.Response{
+						StatusCode: http.StatusOK,
+						Body:       ioutil.NopCloser(bytes.NewBufferString(`%%`)),
+					}, nil)
+
+					_, err := service.GetDeployedProductByName("some-product-name")
+					Expect(err).To(MatchError(ContainSubstring("could not unmarshal deployed products response")))
+				})
+			})
+
+			Context("Target product not in deployed product list", func() {
+				It("returns an error", func() {
+					client.DoReturns(&http.Response{
+						StatusCode: http.StatusOK,
+						Body: ioutil.NopCloser(bytes.NewBufferString(`[
+					{"installation_name":"cf-15b22d1810a034ea3aca","guid":"cf-15b22d1810a034ea3aca","type":"cf","product_version":"1.10.0-build.177"},
+					{"installation_name":"p-isolation-segment-0ab7a3616c32a441a115","guid":"p-isolation-segment-0ab7a3616c32a441a115","type":"p-isolation-segment","product_version":"1.10.0-build.31"}
+				]`)),
+					}, nil)
+
+					_, err := service.GetDeployedProductByName("some-product-name")
+					Expect(err).To(MatchError(ContainSubstring("could not find product \"some-product-name\"")))
+				})
+			})
+		})
+	})
 })
