@@ -269,7 +269,7 @@ var _ = Describe("Director", func() {
 				StatusCode: http.StatusOK,
 				Body:       ioutil.NopCloser(strings.NewReader(`{}`))}, nil)
 
-			err := service.UpdateStagedDirectorNetworks(json.RawMessage(`{"networks": [{"network_property": "yup"}]}`))
+			err := service.UpdateStagedDirectorNetworks(api.NetworkConfiguration{Networks: json.RawMessage(`[{"name": "yup"}]`)})
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(client.DoCallCount()).To(Equal(1))
@@ -283,7 +283,7 @@ var _ = Describe("Director", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(jsonBody).To(MatchJSON(`{
 				"networks": [
-					{"network_property": "yup"}
+					{"name": "yup"}
 				]
 			}`))
 		})
@@ -294,7 +294,7 @@ var _ = Describe("Director", func() {
 					StatusCode: http.StatusInternalServerError,
 					Body:       ioutil.NopCloser(strings.NewReader(`{}`))}, nil)
 
-				err := service.UpdateStagedDirectorNetworks(json.RawMessage("{}"))
+				err := service.UpdateStagedDirectorNetworks(api.NetworkConfiguration{Networks: json.RawMessage("[]")})
 				Expect(err).To(MatchError(ContainSubstring("500 Internal Server Error")))
 			})
 
@@ -303,7 +303,7 @@ var _ = Describe("Director", func() {
 					StatusCode: http.StatusOK,
 					Body:       ioutil.NopCloser(strings.NewReader(`{}`))}, errors.New("api endpoint failed"))
 
-				err := service.UpdateStagedDirectorNetworks(json.RawMessage("{}"))
+				err := service.UpdateStagedDirectorNetworks(api.NetworkConfiguration{Networks: json.RawMessage("[]")})
 				Expect(err).To(MatchError("could not send api request to PUT /api/v0/staged/director/networks: api endpoint failed"))
 			})
 		})

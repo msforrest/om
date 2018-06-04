@@ -29,6 +29,10 @@ type NetworkAndAZConfiguration struct {
 	NetworkAZ json.RawMessage `json:"network_and_az,omitempty"`
 }
 
+type NetworkConfiguration struct {
+	Networks json.RawMessage `json:"networks,omitempty"`
+}
+
 type DirectorProperties struct {
 	IAASConfiguration     json.RawMessage `json:"iaas_configuration,omitempty"`
 	DirectorConfiguration json.RawMessage `json:"director_configuration,omitempty"`
@@ -68,7 +72,7 @@ func (a Api) UpdateStagedDirectorAvailabilityZones(input AvailabilityZoneInput) 
 	return err
 }
 
-func (a Api) UpdateStagedDirectorNetworks(input json.RawMessage) error {
+func (a Api) UpdateStagedDirectorNetworks(input NetworkConfiguration) error {
 	jsonData, err := json.Marshal(&input)
 	if err != nil {
 		return fmt.Errorf("could not marshal json: %s", err)
