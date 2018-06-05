@@ -264,17 +264,42 @@ var _ = Describe("Director", func() {
 	})
 
 	Describe("NetworksConfiguration", func() {
-		It("configures networks", func() {
-			client.DoReturns(&http.Response{
-				StatusCode: http.StatusOK,
-				Body:       ioutil.NopCloser(strings.NewReader(`{}`))}, nil)
+		BeforeEach(func() {
+			client.DoStub = func(req *http.Request) (*http.Response, error) {
+				if req.Method == "GET" {
+					return &http.Response{
+						StatusCode: http.StatusOK,
+						Body: ioutil.NopCloser(strings.NewReader(
+							`{
+								 "networks": [{
+								   "guid": "existing-network-guid",
+								   "name": "existing-network",
+								   "subnets": [{
+								     "guid": "existing-subnet-guid",
+									   "iaas_identifier": "some-iaas"
+						  		 }]
+							   }]
+							 }`,
+						))}, nil
+				} else {
+					return &http.Response{
+						StatusCode: http.StatusOK,
+						Body:       ioutil.NopCloser(strings.NewReader(`{}`))}, nil
+				}
+			}
+		})
 
-			err := service.UpdateStagedDirectorNetworks(api.NetworkConfiguration{Networks: json.RawMessage(`[{"name": "yup"}]`)})
+		It("configures new networks", func() {
+			err := service.UpdateStagedDirectorNetworks(api.NetworkConfigurationInput{Networks: json.RawMessage(`[{"name": "yup", "subnets": [{"iaas_identifier":"new-iaas"}]}]`)})
 			Expect(err).NotTo(HaveOccurred())
 
-			Expect(client.DoCallCount()).To(Equal(1))
-			req := client.DoArgsForCall(0)
+			Expect(client.DoCallCount()).To(Equal(2))
 
+			req := client.DoArgsForCall(0)
+			Expect(req.Method).To(Equal("GET"))
+			Expect(req.URL.Path).To(Equal("/api/v0/staged/director/networks"))
+
+			req = client.DoArgsForCall(1)
 			Expect(req.Method).To(Equal("PUT"))
 			Expect(req.URL.Path).To(Equal("/api/v0/staged/director/networks"))
 			Expect(req.Header.Get("Content-Type")).To(Equal("application/json"))
@@ -282,9 +307,38 @@ var _ = Describe("Director", func() {
 			jsonBody, err := ioutil.ReadAll(req.Body)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(jsonBody).To(MatchJSON(`{
-				"networks": [
-					{"name": "yup"}
-				]
+				"networks": [{
+					"name": "yup",
+					"subnets": [{
+					  "iaas_identifier": "new-iaas"
+					}]
+				}]
+			}`))
+		})
+
+		It("configures existing networks", func() {
+			err := service.UpdateStagedDirectorNetworks(api.NetworkConfigurationInput{Networks: json.RawMessage(`[{"name": "existing-network", "subnets": [{"iaas_identifier":"some-iaas"}]}]`)})
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(client.DoCallCount()).To(Equal(2))
+
+			req := client.DoArgsForCall(0)
+			Expect(req.Method).To(Equal("GET"))
+			Expect(req.URL.Path).To(Equal("/api/v0/staged/director/networks"))
+
+			req = client.DoArgsForCall(1)
+			Expect(req.Method).To(Equal("PUT"))
+			Expect(req.URL.Path).To(Equal("/api/v0/staged/director/networks"))
+			Expect(req.Header.Get("Content-Type")).To(Equal("application/json"))
+
+			jsonBody, err := ioutil.ReadAll(req.Body)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(jsonBody).To(MatchJSON(`{
+				"networks": [{
+					"name": "existing-network",
+				  "guid": "existing-network-guid",
+				  "subnets": [{"guid": "existing-subnet-guid", "iaas_identifier":"some-iaas"}]
+				}]
 			}`))
 		})
 
@@ -294,7 +348,7 @@ var _ = Describe("Director", func() {
 					StatusCode: http.StatusInternalServerError,
 					Body:       ioutil.NopCloser(strings.NewReader(`{}`))}, nil)
 
-				err := service.UpdateStagedDirectorNetworks(api.NetworkConfiguration{Networks: json.RawMessage("[]")})
+				err := service.UpdateStagedDirectorNetworks(api.NetworkConfigurationInput{Networks: json.RawMessage("[]")})
 				Expect(err).To(MatchError(ContainSubstring("500 Internal Server Error")))
 			})
 
@@ -303,8 +357,9 @@ var _ = Describe("Director", func() {
 					StatusCode: http.StatusOK,
 					Body:       ioutil.NopCloser(strings.NewReader(`{}`))}, errors.New("api endpoint failed"))
 
-				err := service.UpdateStagedDirectorNetworks(api.NetworkConfiguration{Networks: json.RawMessage("[]")})
-				Expect(err).To(MatchError("could not send api request to PUT /api/v0/staged/director/networks: api endpoint failed"))
+				err := service.UpdateStagedDirectorNetworks(api.NetworkConfigurationInput{Networks: json.RawMessage("[]")})
+				Expect(err).To(MatchError(ContainSubstring("could not send api request")))
+				Expect(err).To(MatchError(ContainSubstring("api endpoint failed")))
 			})
 		})
 	})

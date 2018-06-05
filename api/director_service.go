@@ -29,8 +29,23 @@ type NetworkAndAZConfiguration struct {
 	NetworkAZ json.RawMessage `json:"network_and_az,omitempty"`
 }
 
-type NetworkConfiguration struct {
-	Networks json.RawMessage `json:"networks,omitempty"`
+type NetworkConfigurationInput struct {
+	Networks json.RawMessage `json:"networks"`
+}
+
+type Network struct {
+	GUID    string    `json:"guid,omitempty"`
+	Name    string    `json:"name,omitempty"`
+	Subnets []*Subnet `json:"subnets,omitempty"`
+}
+
+type Subnet struct {
+	GUID           string `json:"guid,omitempty"`
+	IaasIdentifier string `json:"iaas_identifier,omitempty"`
+}
+
+type NetworkConfigurations struct {
+	Networks []*Network `json:"networks,omitempty"`
 }
 
 type DirectorProperties struct {
@@ -72,8 +87,19 @@ func (a Api) UpdateStagedDirectorAvailabilityZones(input AvailabilityZoneInput) 
 	return err
 }
 
-func (a Api) UpdateStagedDirectorNetworks(input NetworkConfiguration) error {
-	jsonData, err := json.Marshal(&input)
+func (a Api) UpdateStagedDirectorNetworks(input NetworkConfigurationInput) error {
+	networks := NetworkConfigurations{}
+	err := json.Unmarshal(input.Networks, &networks.Networks)
+	if err != nil {
+		return err
+	}
+
+	networks, err = a.addGUIDToExistingNetworks(networks)
+	if err != nil {
+		return err
+	}
+
+	jsonData, err := json.Marshal(networks)
 	if err != nil {
 		return fmt.Errorf("could not marshal json: %s", err)
 	}
@@ -140,6 +166,50 @@ func (a Api) addGUIDToExistingAZs(azs AvailabilityZones) (AvailabilityZones, err
 		}
 	}
 	return azs, nil
+}
+
+func (a Api) addGUIDToExistingNetworks(networks NetworkConfigurations) (NetworkConfigurations, error) {
+	existingNetworksResponse, err := a.sendAPIRequest("GET", "/api/v0/staged/director/networks", nil)
+	if err != nil {
+		if existingNetworksResponse.StatusCode != http.StatusNotFound {
+			return NetworkConfigurations{}, fmt.Errorf("unable to fetch existing network configuration: %s", err)
+		}
+	}
+
+	if existingNetworksResponse.StatusCode == http.StatusNotFound {
+		a.logger.Println("unable to retrieve existing network configuration, attempting to configure anyway")
+		return networks, nil
+	}
+
+	existingNetworksJSON, err := ioutil.ReadAll(existingNetworksResponse.Body)
+	if err != nil {
+		return NetworkConfigurations{}, fmt.Errorf("unable to read existing network configuration: %s", err) // un-tested
+	}
+
+	var existingNetworks NetworkConfigurations
+	err = json.Unmarshal(existingNetworksJSON, &existingNetworks)
+	if err != nil {
+		return NetworkConfigurations{}, fmt.Errorf("problem retrieving existing networks: response is not well-formed: %s", err)
+	}
+
+	for _, network := range networks.Networks {
+		for _, existingNetwork := range existingNetworks.Networks {
+			for _, subnet := range network.Subnets {
+				for _, existingSubnet := range existingNetwork.Subnets {
+					if subnet.IaasIdentifier == existingSubnet.IaasIdentifier {
+						subnet.GUID = existingSubnet.GUID
+						break
+					}
+				}
+			}
+
+			if network.Name == existingNetwork.Name {
+				network.GUID = existingNetwork.GUID
+				break
+			}
+		}
+	}
+	return networks, nil
 }
 
 func (a Api) sendAPIRequest(verb, endpoint string, jsonData []byte) (*http.Response, error) {

@@ -213,12 +213,12 @@ var _ = Describe("configure-director command", func() {
 				`[ {"name": "some-az-1"}, {"name": "some-existing-az"} ]`,
 				"--networks-configuration",
 				`{
-				"networks": [{"network": "network-1"}],
+				"networks": [{"network": "network-1", "subnets": [{"iaas_identifier":"some-iaas"}] }],
 				"top-level": "the-top"
 			}`,
 				"--network-assignment",
 				`{
-				"network": { "name": "some-network"},
+					"network": { "name": "some-network" },
 				"singleton_availability_zone": {"name": "some-az"}
 			}`,
 				"--director-configuration",
@@ -336,6 +336,8 @@ networks-configuration:
 network-assignment:
   network:
     name: some-network
+    subnets:
+      iaas_identifier: some-iaas
   singleton_availability_zone:
     name: some-az
 director-configuration:

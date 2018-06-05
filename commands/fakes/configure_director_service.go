@@ -2,7 +2,6 @@
 package fakes
 
 import (
-	"encoding/json"
 	"sync"
 
 	"github.com/pivotal-cf/om/api"
@@ -20,10 +19,10 @@ type ConfigureDirectorService struct {
 	updateStagedDirectorAvailabilityZonesReturnsOnCall map[int]struct {
 		result1 error
 	}
-	UpdateStagedDirectorNetworksStub        func(json.RawMessage) error
+	UpdateStagedDirectorNetworksStub        func(api.NetworkConfigurationInput) error
 	updateStagedDirectorNetworksMutex       sync.RWMutex
 	updateStagedDirectorNetworksArgsForCall []struct {
-		arg1 json.RawMessage
+		arg1 api.NetworkConfigurationInput
 	}
 	updateStagedDirectorNetworksReturns struct {
 		result1 error
@@ -171,11 +170,11 @@ func (fake *ConfigureDirectorService) UpdateStagedDirectorAvailabilityZonesRetur
 	}{result1}
 }
 
-func (fake *ConfigureDirectorService) UpdateStagedDirectorNetworks(arg1 json.RawMessage) error {
+func (fake *ConfigureDirectorService) UpdateStagedDirectorNetworks(arg1 api.NetworkConfigurationInput) error {
 	fake.updateStagedDirectorNetworksMutex.Lock()
 	ret, specificReturn := fake.updateStagedDirectorNetworksReturnsOnCall[len(fake.updateStagedDirectorNetworksArgsForCall)]
 	fake.updateStagedDirectorNetworksArgsForCall = append(fake.updateStagedDirectorNetworksArgsForCall, struct {
-		arg1 json.RawMessage
+		arg1 api.NetworkConfigurationInput
 	}{arg1})
 	fake.recordInvocation("UpdateStagedDirectorNetworks", []interface{}{arg1})
 	fake.updateStagedDirectorNetworksMutex.Unlock()
@@ -194,7 +193,7 @@ func (fake *ConfigureDirectorService) UpdateStagedDirectorNetworksCallCount() in
 	return len(fake.updateStagedDirectorNetworksArgsForCall)
 }
 
-func (fake *ConfigureDirectorService) UpdateStagedDirectorNetworksArgsForCall(i int) json.RawMessage {
+func (fake *ConfigureDirectorService) UpdateStagedDirectorNetworksArgsForCall(i int) api.NetworkConfigurationInput {
 	fake.updateStagedDirectorNetworksMutex.RLock()
 	defer fake.updateStagedDirectorNetworksMutex.RUnlock()
 	return fake.updateStagedDirectorNetworksArgsForCall[i].arg1
