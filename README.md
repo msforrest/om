@@ -4,7 +4,7 @@ _is a mantra, or vibration, that is traditionally chanted_
 
 ![enhancing your calm](http://i.giphy.com/3o7qDQ5iw1oXyDeJAk.gif)
 
-## What is it?
+## What is this? 
 
 Magical tool that helps you configure and deploy tiles to an Ops-Manager 1.8+ . 
 Currently being developed by RelEng, backlog link is [here](https://www.pivotaltracker.com/n/projects/2145041).
